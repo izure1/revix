@@ -117,12 +117,13 @@ interface Member {
   age: number
 }
 
-const { use } = openRealm<YourInterface>(memberName)
+const { use } = openRealm<Member>(memberName)
 const [name, setName] = use('name', initialName)
 const [age, setAge] = use('age', initialAge)
 ```
 
 ### Advanced usage
+
 ```typescript
 interface IActor {
   hp: number

@@ -3,6 +3,7 @@ import { RealmCollection } from '../realm/RealmCollection'
 import { Signal } from '../signal/Signal'
 
 interface RealmConnectorList extends Record<string, any> {}
+type Unsubscribe = () => void
 
 declare class RealmConnector<R extends RealmConnectorList> {
   /**
@@ -31,9 +32,13 @@ declare class RealmConnector<R extends RealmConnectorList> {
     /**
      * You can register subscribe callbacks to watch this variable change.
      * If the variable is changed, all subscribe callbacks will be called.
+     * This function returns a new function that can be cancel unsubscribed. If you want, just call the returned function.
+     * @example
+     * const unsubscribe = subsVar(({ before, after, reson }) => { ... })
+     * unsubscribe()
      * @param callback callback function
      */
-    (callback: SubscribeCallback<T>) => void
+    (callback: SubscribeCallback<T>) => Unsubscribe
   ]
   /**
    * Returns `true` if a variable exists in the realm, or `false` if not.
@@ -64,7 +69,11 @@ export function openRealm<R extends RealmConnectorList = RealmConnectorList>(sco
     const getter = () => signal.get()
     const setter = (value: T, reason = 'Unknown reason') => signal.set(value, reason)
     const destroyer = (reason = 'Unknown reason') => signal.destroy(reason)
-    const subscriber = (callback: SubscribeCallback<T>) => signal.subscribe(callback)
+    const subscriber = (callback: SubscribeCallback<T>) => {
+      signal.subscribe(callback)
+      const cancel = () => signal.unsubscribe(callback)
+      return cancel
+    }
 
     return {
       getter,

@@ -94,6 +94,16 @@ Destroy a variable.
 You can register subscribe callbacks to watch this variable change.
 If the variable is changed, all subscribe callbacks will be called.
 
+This function returns a new function that can be cancel unsubscribed. If you want, just call the returned function.
+
+```typescript
+const unsubscribe = subscribe(({ before, after, reason }) => {
+  if (reason === 'destroy') {
+    unsubscribe()
+  }
+})
+```
+
 ## With TypeScript
 
 You can use strict variable types with TypeScript.  

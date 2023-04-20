@@ -41,4 +41,30 @@ describe('Realm', () => {
     destroyRealm('a', 'realm down')
     expect(() => av()).toThrowError()
   })
+
+  test('subscribe', () => {
+    const [v, setV, destroyV, subsV] = a.use('v', 1)
+
+    subsV(({ before, after, reason }) => {
+      expect(before).toBe(1)
+      expect(after).toBe(2)
+      expect(reason).toBe('test')
+    })
+    setV(2, 'test')
+  })
+
+  test('cancel subscribe', () => {
+    const [v, setV, destroyV, subsV] = a.use('v', 1)
+    let acc = 0
+    const cancelSubsV = subsV(({ after }) => {
+      acc = after
+      if (after === 5) {
+        cancelSubsV()
+      }
+    })
+    for (let i = 0; i < 10; i++) {
+      setV(i, 'test')
+    }
+    expect(acc).toBe(5)
+  })
 })

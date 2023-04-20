@@ -74,6 +74,18 @@ export class Signal<T = any> extends Destroyable {
     this._checkValid()
     this._subscribes.push(callback)
   }
+
+  /**
+   * Remove subscribe callback function from signal.
+   * @param callback Added Callback function
+   */
+  unsubscribe(callback: SubscribeCallback<T>): void {
+    this._checkValid()
+    const i = this._subscribes.indexOf(callback)
+    if (i !== -1) {
+      this._subscribes.splice(i, 1)
+    }
+  }
   
   /**
    * Destroy this instance.

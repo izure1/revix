@@ -94,7 +94,72 @@ Destroy a variable.
 You can register subscribe callbacks to watch this variable change.
 If the variable is changed, all subscribe callbacks will be called.
 
+## With TypeScript
+
+You can use strict variable types with TypeScript.  
+Just use the `openRealm` function with the generic type.
+
+### Simple example
+
+```typescript
+interface Member {
+  name: string
+  age: number
+}
+
+const { use } = openRealm<YourInterface>(memberName)
+const [name, setName] = use('name', initialName)
+const [age, setAge] = use('age', initialAge)
+```
+
+### Advanced usage
+```typescript
+interface IActor {
+  hp: number
+  mp: number
+}
+
+class Actor implements IActor {
+  constructor() {
+    const { use } = openRealm<IActor>(this)
+    const [hp, setHp, destroyHp, subsHp] = use('hp', 100)
+    const [mp, setMp, destroyMp, subsMp] = use('mp', 100)
+
+    subsHp(() => {
+      // ...TODO
+    })
+    subsMp(() => {
+      // ...TODO
+    })
+  }
+
+  get hp() {
+    const { use } = openRealm<IActor>(this)
+    const [hp] = use('hp', 100)
+    return hp()
+  }
+
+  get mp() {
+    const { use } = openRealm<IActor>(this)
+    const [mp] = use('mp', 100)
+    return mp()
+  }
+
+  gotDamage(damage: number) {
+    const { use } = openRealm<IActor>(this)
+    const [hp, setHp] = use('hp', 100)
+    setHp(hp()-damage, 'Got a damage')
+  }
+}
+```
+
 ## Install
+
+|Site|Link|
+|---|---|
+|**NPM**|[View](https://www.npmjs.com/package/revix)|
+|**Github**|[View](https://github.com/izure1/revix)|
+|**jsdelivr**|[Download](https://cdn.jsdelivr.net/npm/revix@1.x.x/dist/esm/index.min.js)|
 
 ### Node.js (commonjs)
 

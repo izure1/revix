@@ -2,13 +2,15 @@ import type { SubscribeCallback } from '../signal/Signal'
 import { RealmCollection } from '../realm/RealmCollection'
 import { Signal } from '../signal/Signal'
 
-declare class RealmConnector {
+interface RealmConnectorList extends Record<string, any> {}
+
+declare class RealmConnector<R extends RealmConnectorList> {
   /**
    * Get or create a variable for this realm. If this variable has never been used before, it will create a new variable with this value. Otherwise, get an existing variable.
    * @param key Variable name
    * @param initialValue The initial value. If this variable has never been used before, it will create a new variable with this value.
    */
-  use<T>(key: string, initialValue: T): [
+  use<K extends keyof R, T = R[K]>(key: K, initialValue: T): [
     /**
      * Get a value
      */
@@ -37,7 +39,7 @@ declare class RealmConnector {
    * Returns `true` if a variable exists in the realm, or `false` if not.
    * @param key Variable name
    */
-  exists(key: string): boolean
+  exists(key: keyof R): boolean
 }
 
 /**
@@ -45,15 +47,16 @@ declare class RealmConnector {
  * If this realm has never been used before, it will create a new realm with this value. Otherwise, get an existing realm.
  * @param scope The scope of the realm. You can use both primitive types and plain objects.
  */
-export function openRealm(scope: any): RealmConnector {
+export function openRealm<R extends RealmConnectorList = RealmConnectorList>(scope: any): RealmConnector<R> {
   const realm = RealmCollection.GetOrCreate(scope)
 
-  const _getOrCreateSignal = <T>(key: string, initialValue: T) => {
-    if (!realm.hasSignal(key)) {
-      const signal = new Signal<T>(realm, key, initialValue)
+  const _getOrCreateSignal = <K extends keyof R, T>(key: K, initialValue: T) => {
+    const k = key as string
+    if (!realm.hasSignal(k)) {
+      const signal = new Signal<T>(realm, k, initialValue)
       realm.setSignal(signal)
     }
-    const signal = realm.getSignal(key) as Signal<T>
+    const signal = realm.getSignal(k) as Signal<T>
     return signal
   }
 
@@ -71,7 +74,7 @@ export function openRealm(scope: any): RealmConnector {
     }
   }
 
-  const use = <T>(key: string, initialValue: T) => {
+  const use = <K extends keyof R, T = R[K]>(key: K, initialValue: T) => {
     const signal = _getOrCreateSignal(key, initialValue)
     const { getter, setter, destroyer, subscriber } = _createCommand(signal)
     return [
@@ -82,7 +85,7 @@ export function openRealm(scope: any): RealmConnector {
     ] as [typeof getter, typeof setter, typeof destroyer, typeof subscriber]
   }
 
-  const exists = (key: string) => realm.hasSignal(key)
+  const exists = (key: keyof R) => realm.hasSignal(key as string)
 
   return {
     use,

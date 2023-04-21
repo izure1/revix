@@ -1,6 +1,6 @@
 {
   "name": "revix",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Manage variables with realms, scopes, and reasons.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

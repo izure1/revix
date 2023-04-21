@@ -1,13 +1,9 @@
 const esbuild = require('esbuild')
-const { dtsPlugin } = require('esbuild-plugin-d.ts')
 
 const common = {
   target: 'esnext',
   entryPoints: [
     { in: 'src/index.ts', out: 'index' }
-  ],
-  plugins: [
-    dtsPlugin()
   ]
 }
 

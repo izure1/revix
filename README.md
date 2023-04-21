@@ -47,7 +47,7 @@ Destroy the realm. All variables belonging to this realm are also destroyed.
 
 ### **Realm functions**
 
-`use`<`T`>(key: `string`, initialValue: `T`)
+`use`(key: `string`, initialValue: `T`): [`getter`, `setter`, `destroy`, `subscribe`]
 
 Get or create a variable manager for this realm. If this variable has never been created before, it will create a new variable with a `initialValue`. Otherwise, get an existing variable manager.
 
@@ -63,7 +63,7 @@ subsName(({ before, after, reason }) => {
 })
 ```
 
-`exists`(key: `string`)
+`exists`(key: `string`): `boolean`
 
 Returns `true` if a variable exists in the realm, or `false` if not.
 
@@ -89,7 +89,7 @@ Destroy a variable.
 
 **WARNING!** You can't use a same name of variable after destroyed. You should use this function when you are sure the variable will never be used again.
 
-`subscribe`(callback: ({ before: `T`, after: `T`, reason: `string` }) => `void`): `void`
+`subscribe`(callback: ({ before: `T`, after: `T`, reason: `string` }) => `void`): `Unsubscribe`
 
 You can register subscribe callbacks to watch this variable change.
 If the variable is changed, all subscribe callbacks will be called.
@@ -162,6 +162,34 @@ class Actor implements IActor {
     setHp(hp()-damage, 'Got a damage')
   }
 }
+```
+
+Or, you can create your own store.
+
+```typescript
+// store.ts
+import { openRealm } from 'revix'
+
+interface Store {
+  a: number
+  b: string
+  c: boolean
+}
+
+export const STORE_SYMBOL = Symbol('store')
+export const { use } = openRealm<Store>(STORE_SYMBOL)
+
+export const [a, setA, destroyA, subsA] = use('a', 0)
+
+// another.ts
+import { destroyRealm } from 'revix'
+import { subsA } from './store.ts'
+
+subsA(({ reason }) => {
+  if (reason === 'unknown') {
+    destroyRealm(STORE_SYMBOL, 'error')
+  }
+})
 ```
 
 ## Install

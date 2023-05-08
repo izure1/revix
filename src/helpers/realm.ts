@@ -3,6 +3,9 @@ import { RealmCollection } from '../realm/RealmCollection'
 import { Signal } from '../signal/Signal'
 
 interface RealmConnectorList extends Record<string, any> {}
+interface DefaultRealmConnectorList extends RealmConnectorList {
+  [key: string]: any
+}
 /**
  * Unsubscribe value updating.
  * If you call this function, the subscript that returned this function will be canceled.
@@ -10,25 +13,25 @@ interface RealmConnectorList extends Record<string, any> {}
  * const unsubscribe = subsVar(({ before, after, reason }) => { ... })
  * unsubscribe()
  */
-declare function Unsubscribe(): void
+export declare function Unsubscribe(): void
 
-declare class RealmConnector<R extends RealmConnectorList> {
+export declare class IRealmConnector<R extends RealmConnectorList = DefaultRealmConnectorList> {
   /**
    * Get or create a variable for this realm. If this variable has never been used before, it will create a new variable with this value. Otherwise, get an existing variable.
    * @param key Variable name
    * @param initialValue The initial value. If this variable has never been used before, it will create a new variable with this value.
    */
-  use<K extends keyof R, T = R[K]>(key: K, initialValue: T): [
+  use<K extends keyof R>(key: K, initialValue: R[K]): [
     /**
      * Get a value
      */
-    () => T,
+    () => R[K],
     /**
      * Set a value
      * @param value New value
      * @param reason Updating reason. If you are using a `subscribe` function, you can receive a reason when the value is updated.
      */
-    (value: T, reason?: string) => T,
+    (value: R[K], reason?: string) => R[K],
     /**
      * Destroy a variable.
      * 
@@ -45,7 +48,7 @@ declare class RealmConnector<R extends RealmConnectorList> {
      * unsubscribe()
      * @param callback callback function
      */
-    (callback: SubscribeCallback<T>) => typeof Unsubscribe
+    (callback: SubscribeCallback<R[K]>) => typeof Unsubscribe
   ]
   /**
    * Returns `true` if a variable exists in the realm, or `false` if not.
@@ -59,7 +62,7 @@ declare class RealmConnector<R extends RealmConnectorList> {
  * If this realm has never been used before, it will create a new realm with this value. Otherwise, get an existing realm.
  * @param scope The scope of the realm. You can use both primitive types and plain objects.
  */
-export function openRealm<R extends RealmConnectorList = RealmConnectorList>(scope: any): RealmConnector<R> {
+export function openRealm<R extends RealmConnectorList = RealmConnectorList>(scope: any): IRealmConnector<R> {
   const realm = RealmCollection.GetOrCreate(scope)
 
   const _getOrCreateSignal = <K extends keyof R, T>(key: K, initialValue: T) => {

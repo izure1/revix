@@ -1,8 +1,8 @@
-import { openRealm, destroyRealm } from '../src/index'
+import { openRealm, destroyRealm, IRealmConnector } from '../src/index'
 
 describe('Realm', () => {
-  let a: ReturnType<typeof openRealm>
-  let b: ReturnType<typeof openRealm>
+  let a: IRealmConnector<{ v: number }>
+  let b: IRealmConnector<{ v: number }>
   beforeEach(() => {
     if (a) destroyRealm('a', 'test done')
     if (b) destroyRealm('b', 'test done')

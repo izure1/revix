@@ -33,13 +33,6 @@ export declare class IRealmConnector<R extends RealmConnectorList = DefaultRealm
      */
     (value: R[K], reason?: string) => R[K],
     /**
-     * Destroy a variable.
-     * 
-     * **WARNING!** You can't use a same name of variable after destroyed. You should use this function when you are sure the variable will never be used again.
-     * @param reason Destruction reason
-     */
-    (reason?: string) => void,
-    /**
      * You can register subscribe callbacks to watch this variable change.
      * If the variable is changed, all subscribe callbacks will be called.
      * This function returns a new function that can be cancel unsubscribed. If you want, just call the returned function.
@@ -48,7 +41,14 @@ export declare class IRealmConnector<R extends RealmConnectorList = DefaultRealm
      * unsubscribe()
      * @param callback callback function
      */
-    (callback: SubscribeCallback<R[K]>) => typeof Unsubscribe
+    (callback: SubscribeCallback<R[K]>) => typeof Unsubscribe,
+    /**
+     * Destroy a variable.
+     * 
+     * **WARNING!** You can't use a same name of variable after destroyed. You should use this function when you are sure the variable will never be used again.
+     * @param reason Destruction reason
+     */
+    (reason?: string) => void
   ]
   /**
    * Returns `true` if a variable exists in the realm, or `false` if not.
@@ -99,9 +99,9 @@ export function openRealm<R extends RealmConnectorList = RealmConnectorList>(sco
     return [
       getter,
       setter,
+      subscriber,
       destroyer,
-      subscriber
-    ] as [typeof getter, typeof setter, typeof destroyer, typeof subscriber]
+    ] as [typeof getter, typeof setter, typeof subscriber, typeof destroyer]
   }
 
   const exists = (key: keyof R) => realm.hasSignal(key as string)

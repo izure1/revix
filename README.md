@@ -9,7 +9,7 @@ import { openRealm, destroyRealm } from 'revix'
 
 const { use } = openRealm('clock')
 
-const [count, setCount, destroyCount, subsCount] = use('count', 0)
+const [count, setCount, subsCount, destroyCount] = use('count', 0)
 
 subsCount(({ before, after, reason }) => {
   console.log(`Updated to ${after} from ${before} cause ${reason}`)
@@ -52,7 +52,7 @@ Destroy the realm. All variables belonging to this realm are also destroyed.
 Get or create a variable manager for this realm. If this variable has never been created before, it will create a new variable with a `initialValue`. Otherwise, get an existing variable manager.
 
 ```typescript
-const [name, setName, destroyName, subsName] = use('name', 'baba')
+const [name, setName, subsName, destroyName] = use('name', 'baba')
 
 name() // baba
 setName('keke', 'no reason')
@@ -133,8 +133,8 @@ interface IActor {
 class Actor implements IActor {
   constructor() {
     const { use } = openRealm<IActor>(this)
-    const [hp, setHp, destroyHp, subsHp] = use('hp', 100)
-    const [mp, setMp, destroyMp, subsMp] = use('mp', 100)
+    const [hp, setHp, subsHp, destroyHp] = use('hp', 100)
+    const [mp, setMp, subsMp, destroyMp] = use('mp', 100)
 
     subsHp(() => {
       // ...TODO
@@ -179,7 +179,7 @@ interface Store {
 export const STORE_SYMBOL = Symbol('store')
 export const { use } = openRealm<Store>(STORE_SYMBOL)
 
-export const [a, setA, destroyA, subsA] = use('a', 0)
+export const [a, setA, subsA, destroyA] = use('a', 0)
 
 // another.ts
 import { destroyRealm } from 'revix'

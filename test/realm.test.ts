@@ -22,7 +22,7 @@ describe('Realm', () => {
   })
 
   test('signal destroy', () => {
-    const [_av, setAV, destroyAV] = a.use('v', 1)
+    const [_av, setAV, _subsAV, destroyAV] = a.use('v', 1)
     const [bv] = b.use('v', 2)
 
     destroyAV()
@@ -43,7 +43,7 @@ describe('Realm', () => {
   })
 
   test('subscribe', () => {
-    const [v, setV, destroyV, subsV] = a.use('v', 1)
+    const [v, setV, subsV, destroyV] = a.use('v', 1)
 
     subsV(({ before, after, reason }) => {
       expect(before).toBe(1)
@@ -54,7 +54,7 @@ describe('Realm', () => {
   })
 
   test('cancel subscribe', () => {
-    const [v, setV, destroyV, subsV] = a.use('v', 1)
+    const [v, setV, subsV, destroyV] = a.use('v', 1)
     let acc = 0
     const cancelSubsV = subsV(({ after }) => {
       acc = after

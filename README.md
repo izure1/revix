@@ -47,7 +47,7 @@ Destroy the realm. All variables belonging to this realm are also destroyed.
 
 ### **Realm functions**
 
-`use`(key: `string`, initialValue: `T`): [`getter`, `setter`, `destroy`, `subscribe`]
+`use`(key: `string`, initialValue: `T`): [`getter`, `setter`, `subscribe`, `destroy`]
 
 Get or create a variable manager for this realm. If this variable has never been created before, it will create a new variable with a `initialValue`. Otherwise, get an existing variable manager.
 
@@ -72,7 +72,7 @@ Returns `true` if a variable exists in the realm, or `false` if not.
 The variable manager is an array and each item is the same as the next,
 
 ```typescript
-[getter, setter, destroy, subscribe] = use(key, value)
+[getter, setter, subscribe, destroy] = use(key, value)
 ```
 
 `getter`(): `T`
@@ -82,12 +82,6 @@ Get a value.
 `setter`(value: `T`, reason?: `string`): `T`
 
 Set a value.
-
-`destroy`(reason?: `string`): `void`
-
-Destroy a variable.
-
-**WARNING!** You can't use a same name of variable after destroyed. You should use this function when you are sure the variable will never be used again.
 
 `subscribe`(callback: ({ before: `T`, after: `T`, reason: `string` }) => `void`): `Unsubscribe`
 
@@ -103,6 +97,12 @@ const unsubscribe = subscribe(({ before, after, reason }) => {
   }
 })
 ```
+
+`destroy`(reason?: `string`): `void`
+
+Destroy a variable.
+
+**WARNING!** You can't use a same name of variable after destroyed. You should use this function when you are sure the variable will never be used again.
 
 ## With TypeScript
 
